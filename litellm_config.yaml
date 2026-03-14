@@ -1,0 +1,56 @@
+model_list:
+  - model_name: local-code-medium
+    litellm_params:
+      model: openai/worker-m1pro-a
+      api_base: http://192.168.1.101:8001/v1
+      api_key: sk-local
+
+  - model_name: local-code-medium-alt
+    litellm_params:
+      model: openai/worker-m1pro-b
+      api_base: http://192.168.1.102:8001/v1
+      api_key: sk-local
+
+  - model_name: local-code-small-a
+    litellm_params:
+      model: openai/worker-m1-a
+      api_base: http://192.168.1.111:8001/v1
+      api_key: sk-local
+
+  - model_name: local-code-small-b
+    litellm_params:
+      model: openai/worker-m1-b
+      api_base: http://192.168.1.112:8001/v1
+      api_key: sk-local
+
+  - model_name: local-code-small-c
+    litellm_params:
+      model: openai/worker-m1-c
+      api_base: http://192.168.1.113:8001/v1
+      api_key: sk-local
+
+  - model_name: local-code-small-d
+    litellm_params:
+      model: openai/worker-m1-d
+      api_base: http://192.168.1.114:8001/v1
+      api_key: sk-local
+
+  - model_name: local-code-small-e
+    litellm_params:
+      model: openai/worker-m2-air
+      api_base: http://192.168.1.115:8001/v1
+      api_key: sk-local
+
+  - model_name: local-code-small-f
+    litellm_params:
+      model: openai/worker-m3-air
+      api_base: http://192.168.1.116:8001/v1
+      api_key: sk-local
+
+litellm_settings:
+  master_key: sk-local
+  set_verbose: true
+
+general_settings:
+  completion_model: local-code-medium
+
