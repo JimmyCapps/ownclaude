@@ -16,7 +16,12 @@ if [[ -z "$BREW_BIN" ]]; then
   fi
 fi
 
+# Ensure Homebrew-installed tools are visible in non-login shells.
+eval "$("$BREW_BIN" shellenv)"
+
 "$BREW_BIN" install cmake git wget hf
+
+eval "$("$BREW_BIN" shellenv)"
 
 if ! command -v hf >/dev/null 2>&1 && ! command -v huggingface-cli >/dev/null 2>&1; then
   echo "Hugging Face CLI was not installed correctly"
