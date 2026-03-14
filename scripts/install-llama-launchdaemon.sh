@@ -21,12 +21,23 @@ MMPROJ_PATH="${MMPROJ_PATH:-}"
 LLAMA_SERVER_BIN="${LLAMA_SERVER_BIN:-$HOME/llama.cpp/llama-server}"
 LABEL="${LABEL:-com.ownclaude.llama-server}"
 WORK_DIR="${WORK_DIR:-/opt/ownclaude}"
+BIN_DIR="$WORK_DIR/bin"
 LOG_DIR="$WORK_DIR/log"
 PLIST_PATH="/Library/LaunchDaemons/${LABEL}.plist"
+STAGED_BIN="$BIN_DIR/llama-server"
 
-mkdir -p "$WORK_DIR" "$LOG_DIR"
+if [[ ! -x "$LLAMA_SERVER_BIN" ]]; then
+  echo "llama-server not found at $LLAMA_SERVER_BIN"
+  exit 1
+fi
+
+mkdir -p "$WORK_DIR" "$BIN_DIR" "$LOG_DIR"
 chown -R root:wheel "$WORK_DIR"
-chmod 755 "$WORK_DIR" "$LOG_DIR"
+chmod 755 "$WORK_DIR" "$BIN_DIR" "$LOG_DIR"
+
+cp "$LLAMA_SERVER_BIN" "$STAGED_BIN"
+chown root:wheel "$STAGED_BIN"
+chmod 755 "$STAGED_BIN"
 
 cat > "$PLIST_PATH" <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
@@ -37,7 +48,7 @@ cat > "$PLIST_PATH" <<EOF
   <string>${LABEL}</string>
   <key>ProgramArguments</key>
   <array>
-    <string>${LLAMA_SERVER_BIN}</string>
+    <string>${STAGED_BIN}</string>
     <string>--model</string>
     <string>${MODEL_PATH}</string>
     <string>--alias</string>
