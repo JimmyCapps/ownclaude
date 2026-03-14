@@ -2,6 +2,8 @@
 
 This workspace is a starter for running Claude Code against a home cluster of local models behind LiteLLM.
 
+Important: the current scripts expect Homebrew's Hugging Face CLI as `hf`. They no longer rely on `huggingface-cli` being present as a binary name.
+
 ## What your hardware can realistically do
 
 You have:

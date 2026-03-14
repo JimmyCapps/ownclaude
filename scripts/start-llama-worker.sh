@@ -11,6 +11,7 @@ MODEL_PATH="$1"
 MODEL_ALIAS="$2"
 PORT="${3:-8001}"
 CTX_SIZE="${4:-16384}"
+MMPROJ_PATH="${MMPROJ_PATH:-}"
 
 LLAMA_SERVER_BIN="${LLAMA_SERVER_BIN:-$HOME/llama.cpp/llama-server}"
 
@@ -20,17 +21,24 @@ if [[ ! -x "$LLAMA_SERVER_BIN" ]]; then
   exit 1
 fi
 
-exec "$LLAMA_SERVER_BIN" \
-  --model "$MODEL_PATH" \
-  --alias "$MODEL_ALIAS" \
-  --host 0.0.0.0 \
-  --port "$PORT" \
-  --ctx-size "$CTX_SIZE" \
-  --threads -1 \
-  --flash-attn on \
-  --kv-unified \
-  --cache-type-k q8_0 \
-  --cache-type-v q8_0 \
-  --batch-size 1024 \
-  --ubatch-size 512 \
+ARGS=(
+  --model "$MODEL_PATH"
+  --alias "$MODEL_ALIAS"
+  --host 0.0.0.0
+  --port "$PORT"
+  --ctx-size "$CTX_SIZE"
+  --threads -1
+  --flash-attn on
+  --kv-unified
+  --cache-type-k q8_0
+  --cache-type-v q8_0
+  --batch-size 1024
+  --ubatch-size 512
   --no-webui
+)
+
+if [[ -n "$MMPROJ_PATH" ]]; then
+  ARGS+=(--mmproj "$MMPROJ_PATH")
+fi
+
+exec "$LLAMA_SERVER_BIN" "${ARGS[@]}"

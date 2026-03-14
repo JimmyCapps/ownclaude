@@ -6,7 +6,7 @@ RAW_BASE="${RAW_BASE:-https://raw.githubusercontent.com/JimmyCapps/ownclaude/mai
 TMP_DIR="$(mktemp -d "${TMPDIR:-/tmp}/ownclaude.XXXXXX")"
 trap 'rm -rf "$TMP_DIR"' EXIT
 
-MODEL_FILENAME="${MODEL_FILENAME:-Qwen3.5-9B-Q4_K_M.gguf}"
+MODEL_FILENAME="${MODEL_FILENAME:-Qwen_Qwen3.5-9B-Q4_K_M.gguf}"
 MODEL_ALIAS="${MODEL_ALIAS:-qwen35-9b}"
 MODEL_DIR="${MODEL_DIR:-$HOME/models/qwen35-9b}"
 PORT="${PORT:-8001}"

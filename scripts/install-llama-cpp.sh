@@ -18,6 +18,11 @@ fi
 
 "$BREW_BIN" install cmake git wget huggingface-cli
 
+if ! command -v hf >/dev/null 2>&1 && ! command -v huggingface-cli >/dev/null 2>&1; then
+  echo "Hugging Face CLI was not installed correctly"
+  exit 1
+fi
+
 if [[ ! -d "$LLAMA_CPP_DIR/.git" ]]; then
   git clone https://github.com/ggml-org/llama.cpp.git "$LLAMA_CPP_DIR"
 fi
