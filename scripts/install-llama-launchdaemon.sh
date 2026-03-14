@@ -21,38 +21,12 @@ MMPROJ_PATH="${MMPROJ_PATH:-}"
 LLAMA_SERVER_BIN="${LLAMA_SERVER_BIN:-$HOME/llama.cpp/llama-server}"
 LABEL="${LABEL:-com.ownclaude.llama-server}"
 WORK_DIR="${WORK_DIR:-/opt/ownclaude}"
-BIN_DIR="$WORK_DIR/bin"
 LOG_DIR="$WORK_DIR/log"
 PLIST_PATH="/Library/LaunchDaemons/${LABEL}.plist"
-RUNNER_PATH="$BIN_DIR/${LABEL}.sh"
 
-mkdir -p "$BIN_DIR" "$LOG_DIR"
-
-cat > "$RUNNER_PATH" <<EOF
-#!/usr/bin/env bash
-set -euo pipefail
-ARGS=(
-  --model "$MODEL_PATH"
-  --alias "$MODEL_ALIAS"
-  --host 0.0.0.0
-  --port "$PORT"
-  --ctx-size "$CTX_SIZE"
-  --threads -1
-  --flash-attn on
-  --kv-unified
-  --cache-type-k q8_0
-  --cache-type-v q8_0
-  --batch-size 1024
-  --ubatch-size 512
-  --no-webui
-)
-if [[ -n "$MMPROJ_PATH" ]]; then
-  ARGS+=(--mmproj "$MMPROJ_PATH")
-fi
-exec "$LLAMA_SERVER_BIN" "\${ARGS[@]}"
-EOF
-
-chmod 755 "$RUNNER_PATH"
+mkdir -p "$WORK_DIR" "$LOG_DIR"
+chown -R root:wheel "$WORK_DIR"
+chmod 755 "$WORK_DIR" "$LOG_DIR"
 
 cat > "$PLIST_PATH" <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
@@ -63,7 +37,31 @@ cat > "$PLIST_PATH" <<EOF
   <string>${LABEL}</string>
   <key>ProgramArguments</key>
   <array>
-    <string>${RUNNER_PATH}</string>
+    <string>${LLAMA_SERVER_BIN}</string>
+    <string>--model</string>
+    <string>${MODEL_PATH}</string>
+    <string>--alias</string>
+    <string>${MODEL_ALIAS}</string>
+    <string>--host</string>
+    <string>0.0.0.0</string>
+    <string>--port</string>
+    <string>${PORT}</string>
+    <string>--ctx-size</string>
+    <string>${CTX_SIZE}</string>
+    <string>--threads</string>
+    <string>-1</string>
+    <string>--flash-attn</string>
+    <string>on</string>
+    <string>--kv-unified</string>
+    <string>--cache-type-k</string>
+    <string>q8_0</string>
+    <string>--cache-type-v</string>
+    <string>q8_0</string>
+    <string>--batch-size</string>
+    <string>1024</string>
+    <string>--ubatch-size</string>
+    <string>512</string>
+    <string>--no-webui</string>
   </array>
   <key>RunAtLoad</key>
   <true/>
@@ -81,6 +79,11 @@ cat > "$PLIST_PATH" <<EOF
 </plist>
 EOF
 
+if [[ -n "$MMPROJ_PATH" ]]; then
+  /usr/libexec/PlistBuddy -c "Add :ProgramArguments:25 string --mmproj" "$PLIST_PATH"
+  /usr/libexec/PlistBuddy -c "Add :ProgramArguments:26 string $MMPROJ_PATH" "$PLIST_PATH"
+fi
+
 chmod 644 "$PLIST_PATH"
 chown root:wheel "$PLIST_PATH"
 
@@ -90,7 +93,6 @@ launchctl enable "system/${LABEL}"
 launchctl kickstart -k "system/${LABEL}"
 
 echo "Installed LaunchDaemon: $PLIST_PATH"
-echo "Runner script: $RUNNER_PATH"
 echo "Logs:"
 echo "  $LOG_DIR/${LABEL}.out.log"
 echo "  $LOG_DIR/${LABEL}.err.log"
