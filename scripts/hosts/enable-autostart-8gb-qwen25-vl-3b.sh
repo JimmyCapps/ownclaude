@@ -14,11 +14,20 @@ PORT="${PORT:-8001}"
 CTX_SIZE="${CTX_SIZE:-8192}"
 LABEL="${LABEL:-com.ownclaude.llama-server}"
 LLAMA_SERVER_BIN="${LLAMA_SERVER_BIN:-$HOME/llama.cpp/llama-server}"
+WORKER_API_KEY_FILE="${WORKER_API_KEY_FILE:-$HOME/.ownclaude/llama-api-key}"
 
 curl -fsSL "$RAW_BASE/scripts/install-llama-launchdaemon.sh" -o "$TMP_DIR/install-llama-launchdaemon.sh"
 chmod +x "$TMP_DIR/install-llama-launchdaemon.sh"
 
-sudo LLAMA_SERVER_BIN="$LLAMA_SERVER_BIN" LABEL="$LABEL" MMPROJ_PATH="$MODEL_DIR/$MMPROJ_FILENAME" \
+if [[ ! -f "$WORKER_API_KEY_FILE" ]]; then
+  echo "worker API key file not found: $WORKER_API_KEY_FILE"
+  echo "run the model install script first"
+  exit 1
+fi
+
+WORKER_API_KEY="$(cat "$WORKER_API_KEY_FILE")"
+
+sudo LLAMA_SERVER_BIN="$LLAMA_SERVER_BIN" LABEL="$LABEL" API_KEY="$WORKER_API_KEY" MMPROJ_PATH="$MODEL_DIR/$MMPROJ_FILENAME" \
   bash "$TMP_DIR/install-llama-launchdaemon.sh" \
   "$MODEL_DIR/$MODEL_FILENAME" \
   "$MODEL_ALIAS" \

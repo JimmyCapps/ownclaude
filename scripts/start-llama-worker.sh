@@ -12,6 +12,7 @@ MODEL_ALIAS="$2"
 PORT="${3:-8001}"
 CTX_SIZE="${4:-16384}"
 MMPROJ_PATH="${MMPROJ_PATH:-}"
+API_KEY="${API_KEY:-}"
 
 LLAMA_SERVER_BIN="${LLAMA_SERVER_BIN:-$HOME/llama.cpp/llama-server}"
 
@@ -39,6 +40,10 @@ ARGS=(
 
 if [[ -n "$MMPROJ_PATH" ]]; then
   ARGS+=(--mmproj "$MMPROJ_PATH")
+fi
+
+if [[ -n "$API_KEY" ]]; then
+  ARGS+=(--api-key "$API_KEY")
 fi
 
 exec "$LLAMA_SERVER_BIN" "${ARGS[@]}"

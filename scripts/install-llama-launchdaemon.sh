@@ -17,6 +17,7 @@ MODEL_ALIAS="$2"
 PORT="${3:-8001}"
 CTX_SIZE="${4:-16384}"
 MMPROJ_PATH="${MMPROJ_PATH:-}"
+API_KEY="${API_KEY:-}"
 
 LLAMA_SERVER_BIN="${LLAMA_SERVER_BIN:-$HOME/llama.cpp/llama-server}"
 LABEL="${LABEL:-com.ownclaude.llama-server}"
@@ -38,6 +39,19 @@ chmod 755 "$WORK_DIR" "$BIN_DIR" "$LOG_DIR"
 cp "$LLAMA_SERVER_BIN" "$STAGED_BIN"
 chown root:wheel "$STAGED_BIN"
 chmod 755 "$STAGED_BIN"
+
+EXTRA_PROGRAM_ARGS=""
+if [[ -n "$MMPROJ_PATH" ]]; then
+  EXTRA_PROGRAM_ARGS="${EXTRA_PROGRAM_ARGS}
+    <string>--mmproj</string>
+    <string>${MMPROJ_PATH}</string>"
+fi
+
+if [[ -n "$API_KEY" ]]; then
+  EXTRA_PROGRAM_ARGS="${EXTRA_PROGRAM_ARGS}
+    <string>--api-key</string>
+    <string>${API_KEY}</string>"
+fi
 
 cat > "$PLIST_PATH" <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
@@ -73,6 +87,7 @@ cat > "$PLIST_PATH" <<EOF
     <string>--ubatch-size</string>
     <string>512</string>
     <string>--no-webui</string>
+${EXTRA_PROGRAM_ARGS}
   </array>
   <key>RunAtLoad</key>
   <true/>
@@ -89,11 +104,6 @@ cat > "$PLIST_PATH" <<EOF
 </dict>
 </plist>
 EOF
-
-if [[ -n "$MMPROJ_PATH" ]]; then
-  /usr/libexec/PlistBuddy -c "Add :ProgramArguments:25 string --mmproj" "$PLIST_PATH"
-  /usr/libexec/PlistBuddy -c "Add :ProgramArguments:26 string $MMPROJ_PATH" "$PLIST_PATH"
-fi
 
 chmod 644 "$PLIST_PATH"
 chown root:wheel "$PLIST_PATH"

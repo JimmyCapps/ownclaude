@@ -6,6 +6,8 @@ Important: the current scripts expect Homebrew's Hugging Face CLI as `hf`. They 
 
 For LAN-only rollout, you can mirror this repo on the Pi and point workers at `OWNCLAUDE_RAW_BASE=http://10.10.10.10:8091`.
 
+Worker auth is enabled. Each host generates a random `llama.cpp` API key during the model install step and the autostart step configures `llama-server` to require it.
+
 ## What your hardware can realistically do
 
 You have:
