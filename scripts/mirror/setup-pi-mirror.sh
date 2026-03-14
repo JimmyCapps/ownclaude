@@ -14,6 +14,8 @@ BRANCH="${BRANCH:-main}"
 MIRROR_ROOT="${MIRROR_ROOT:-/srv/ownclaude-mirror}"
 CHECKOUT_DIR="$MIRROR_ROOT/repo"
 PUBLIC_DIR="$MIRROR_ROOT/public"
+MODEL_SOURCE_DIR="${MODEL_SOURCE_DIR:-/srv/models}"
+PUBLIC_MODELS_DIR="$PUBLIC_DIR/models"
 BIN_DIR="$MIRROR_ROOT/bin"
 LOG_DIR="$MIRROR_ROOT/log"
 SYNC_SCRIPT="$BIN_DIR/sync.sh"
@@ -26,7 +28,7 @@ SYNC_INTERVAL_MINUTES="${SYNC_INTERVAL_MINUTES:-1}"
 apt-get update
 apt-get install -y git python3 rsync
 
-mkdir -p "$CHECKOUT_DIR" "$PUBLIC_DIR" "$BIN_DIR" "$LOG_DIR"
+mkdir -p "$CHECKOUT_DIR" "$PUBLIC_DIR" "$PUBLIC_MODELS_DIR" "$BIN_DIR" "$LOG_DIR"
 chown -R "$RUN_USER:$RUN_GROUP" "$MIRROR_ROOT"
 
 if [[ ! -d "$CHECKOUT_DIR/.git" ]]; then
@@ -43,6 +45,7 @@ set -euo pipefail
 PUBLIC_DIR="${PUBLIC_DIR}"
 STATUS_MESSAGE="\${1:-stale script mirror; retry shortly}"
 mkdir -p "\$PUBLIC_DIR/scripts/hosts" "\$PUBLIC_DIR/scripts/mirror"
+mkdir -p "\$PUBLIC_DIR/models"
 
 write_stale() {
   local path="\$1"
@@ -89,6 +92,8 @@ set -euo pipefail
 
 PUBLIC_DIR="${PUBLIC_DIR}"
 CHECKOUT_DIR="${CHECKOUT_DIR}"
+MODEL_SOURCE_DIR="${MODEL_SOURCE_DIR}"
+PUBLIC_MODELS_DIR="${PUBLIC_MODELS_DIR}"
 LOG_DIR="${LOG_DIR}"
 BRANCH="${BRANCH}"
 
@@ -106,7 +111,14 @@ fi
 rsync -a --delete \
   --exclude '.git' \
   --exclude '.DS_Store' \
+  --exclude 'models' \
   "$CHECKOUT_DIR"/ "$PUBLIC_DIR"/
+
+if [[ -d "$MODEL_SOURCE_DIR" ]]; then
+  rsync -a --delete "$MODEL_SOURCE_DIR"/ "$PUBLIC_MODELS_DIR"/
+else
+  mkdir -p "$PUBLIC_MODELS_DIR"
+fi
 
 cat > "$PUBLIC_DIR/status.json" <<EOS
 {"status":"ok","branch":"$BRANCH","commit":"\$LOCAL_COMMIT"}
@@ -178,4 +190,5 @@ systemctl enable --now ownclaude-mirror-http.service
 echo "Mirror ready at http://$HTTP_BIND:$HTTP_PORT/"
 echo "Repo checkout: $CHECKOUT_DIR"
 echo "Published mirror: $PUBLIC_DIR"
+echo "Published models: $PUBLIC_MODELS_DIR"
 echo "Mirror status: $BIN_DIR/status.sh"

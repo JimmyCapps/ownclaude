@@ -386,6 +386,7 @@ This creates:
 
 - a git checkout under `/srv/ownclaude-mirror/repo`
 - a published mirror under `/srv/ownclaude-mirror/public`
+- a copied model tree under `/srv/ownclaude-mirror/public/models`
 - a systemd timer that pulls from GitHub every minute
 - a systemd HTTP service on `10.10.10.10:8091`
 
@@ -399,6 +400,7 @@ Verify the mirror:
 ```bash
 curl -fsSL http://10.10.10.10:8091/scripts/install-llama-launchdaemon.sh | sed -n '1,40p'
 curl -fsSL http://10.10.10.10:8091/status.json
+curl -I http://10.10.10.10:8091/models/qwen35-4b/Qwen_Qwen3.5-4B-Q4_K_M.gguf
 ```
 
 ## Autostart setup
