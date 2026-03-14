@@ -16,7 +16,7 @@ if [[ -z "$BREW_BIN" ]]; then
   fi
 fi
 
-"$BREW_BIN" install cmake git wget huggingface-cli
+"$BREW_BIN" install cmake git wget hf
 
 if ! command -v hf >/dev/null 2>&1 && ! command -v huggingface-cli >/dev/null 2>&1; then
   echo "Hugging Face CLI was not installed correctly"

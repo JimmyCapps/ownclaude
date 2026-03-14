@@ -4,6 +4,8 @@ This workspace is a starter for running Claude Code against a home cluster of lo
 
 Important: the current scripts expect Homebrew's Hugging Face CLI as `hf`. They no longer rely on `huggingface-cli` being present as a binary name.
 
+For LAN-only rollout, you can mirror this repo on the Pi and point workers at `OWNCLAUDE_RAW_BASE=http://10.10.10.10:8091`.
+
 ## What your hardware can realistically do
 
 You have:
@@ -255,6 +257,15 @@ curl -fsSL https://raw.githubusercontent.com/JimmyCapps/ownclaude/main/scripts/h
 curl -fsSL https://raw.githubusercontent.com/JimmyCapps/ownclaude/main/scripts/hosts/enable-autostart-8gb-qwen25-vl-3b.sh | bash
 ```
 
+Direct from local mirror:
+
+```bash
+export OWNCLAUDE_RAW_BASE="http://10.10.10.10:8091"
+curl -fsSL "$OWNCLAUDE_RAW_BASE/scripts/hosts/configure-dedicated-mac.sh" | sudo bash
+curl -fsSL "$OWNCLAUDE_RAW_BASE/scripts/hosts/8gb-qwen35-4b.sh" | bash
+curl -fsSL "$OWNCLAUDE_RAW_BASE/scripts/hosts/enable-autostart-8gb-qwen35-4b.sh" | bash
+```
+
 Direct rollback from GitHub:
 
 ```bash
@@ -362,6 +373,26 @@ The scripts default to Bartowski GGUF repos on Hugging Face for practical Apple 
 These settings are intended for dedicated LAN-only worker Macs.
 
 One important physical limitation remains: MacBooks still sleep when the lid is closed unless you run them in supported clamshell conditions or use other unsupported workarounds. The commands here keep the machine awake and reachable when powered on at the login window, but they do not bypass normal lid-close behavior.
+
+## Pi Mirror
+
+To serve this repo locally from the LiteLLM Pi on `10.10.10.10:8091` and auto-sync from GitHub:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/JimmyCapps/ownclaude/main/scripts/mirror/setup-pi-mirror.sh | sudo bash
+```
+
+This creates:
+
+- a git checkout under `/srv/ownclaude-mirror/repo`
+- a systemd timer that pulls from GitHub every minute
+- a systemd HTTP service on `10.10.10.10:8091`
+
+Verify the mirror:
+
+```bash
+curl -fsSL http://10.10.10.10:8091/scripts/install-llama-launchdaemon.sh | sed -n '1,40p'
+```
 
 ## Autostart setup
 

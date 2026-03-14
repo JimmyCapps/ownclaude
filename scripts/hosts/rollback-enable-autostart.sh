@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-RAW_BASE="${RAW_BASE:-https://raw.githubusercontent.com/JimmyCapps/ownclaude/main}"
+RAW_BASE="${RAW_BASE:-${OWNCLAUDE_RAW_BASE:-https://raw.githubusercontent.com/JimmyCapps/ownclaude/main}}"
 TMP_DIR="$(mktemp -d "${TMPDIR:-/tmp}/ownclaude.XXXXXX")"
 trap 'rm -rf "$TMP_DIR"' EXIT
 
