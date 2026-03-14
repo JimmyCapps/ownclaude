@@ -19,8 +19,13 @@ WORKER_API_KEY_FILE="${WORKER_API_KEY_FILE:-$HOME/.ownclaude/llama-api-key}"
 curl -fsSL "$RAW_BASE/scripts/install-llama-cpp.sh" -o "$TMP_DIR/install-llama-cpp.sh"
 curl -fsSL "$RAW_BASE/scripts/download-model.sh" -o "$TMP_DIR/download-model.sh"
 curl -fsSL "$RAW_BASE/scripts/ensure-worker-api-key.sh" -o "$TMP_DIR/ensure-worker-api-key.sh"
+curl -fsSL "$RAW_BASE/scripts/hosts/prereq.sh" -o "$TMP_DIR/prereq.sh"
 
-chmod +x "$TMP_DIR/install-llama-cpp.sh" "$TMP_DIR/download-model.sh" "$TMP_DIR/ensure-worker-api-key.sh"
+chmod +x "$TMP_DIR/install-llama-cpp.sh" "$TMP_DIR/download-model.sh" "$TMP_DIR/ensure-worker-api-key.sh" "$TMP_DIR/prereq.sh"
+
+if ! command -v brew >/dev/null 2>&1 && [[ ! -x /opt/homebrew/bin/brew ]] && [[ ! -x /usr/local/bin/brew ]]; then
+  bash "$TMP_DIR/prereq.sh"
+fi
 
 bash "$TMP_DIR/install-llama-cpp.sh"
 bash "$TMP_DIR/download-model.sh" "$MODEL_REPO" "$MODEL_FILENAME" "$MODEL_DIR"
