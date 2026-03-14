@@ -356,7 +356,7 @@ Rollback scripts:
 - stop any running `llama-server` that matches the configured model alias
 - remove the downloaded model directory created by the matching host script
 - remove the default `$HOME/llama.cpp` checkout if present
-- restore reachable-but-normal macOS power settings for the baseline script
+- restore reachable-but-normal macOS power settings for the baseline script while preserving SSH access
 - remove the `LaunchDaemon` for the autostart script
 
 Rollback does not uninstall Homebrew or remove shared packages such as `cmake`, `git`, `wget`, or `huggingface-cli`, because those may have existed before testing.

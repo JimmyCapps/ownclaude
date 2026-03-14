@@ -7,10 +7,6 @@ if [[ "${EUID}" -ne 0 ]]; then
   exit 1
 fi
 
-echo "Disabling SSH"
-systemsetup -setremotelogin off
-launchctl disable system/com.openssh.sshd || true
-
 echo "Restoring standard power settings"
 pmset -a sleep 10
 pmset -a disksleep 10
