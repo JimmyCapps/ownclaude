@@ -64,6 +64,7 @@ for path in \
   "\$PUBLIC_DIR/scripts/install-llama-launchdaemon.sh" \
   "\$PUBLIC_DIR/scripts/remove-llama-launchdaemon.sh" \
   "\$PUBLIC_DIR/scripts/start-llama-worker.sh" \
+  "\$PUBLIC_DIR/scripts/hosts/prereq.sh" \
   "\$PUBLIC_DIR/scripts/hosts/configure-dedicated-mac.sh" \
   "\$PUBLIC_DIR/scripts/hosts/8gb-qwen35-4b.sh" \
   "\$PUBLIC_DIR/scripts/hosts/8gb-qwen25-vl-3b.sh" \
