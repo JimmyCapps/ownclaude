@@ -13,8 +13,6 @@ PLIST_PATH="/Library/LaunchDaemons/${LABEL}.plist"
 LOG_DIR="$WORK_DIR/log"
 
 launchctl bootout system "$PLIST_PATH" >/dev/null 2>&1 || true
-launchctl disable "system/${LABEL}" >/dev/null 2>&1 || true
-
 rm -f "$PLIST_PATH"
 
 echo "Removed LaunchDaemon: $PLIST_PATH"

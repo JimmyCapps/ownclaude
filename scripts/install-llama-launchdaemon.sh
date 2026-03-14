@@ -99,8 +99,8 @@ chmod 644 "$PLIST_PATH"
 chown root:wheel "$PLIST_PATH"
 
 launchctl bootout system "$PLIST_PATH" >/dev/null 2>&1 || true
-launchctl bootstrap system "$PLIST_PATH"
 launchctl enable "system/${LABEL}"
+launchctl bootstrap system "$PLIST_PATH"
 launchctl kickstart -k "system/${LABEL}"
 
 echo "Installed LaunchDaemon: $PLIST_PATH"
