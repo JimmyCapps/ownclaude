@@ -5,6 +5,7 @@ This workspace is a starter for running Claude Code against a home cluster of lo
 Important: the current scripts expect Homebrew's Hugging Face CLI as `hf`. They no longer rely on `huggingface-cli` being present as a binary name.
 
 For LAN-only rollout, you can mirror this repo on the Pi and point workers at `OWNCLAUDE_RAW_BASE=http://10.10.10.10:8091`.
+For model downloads from the Pi mirror, also set `OWNCLAUDE_MODEL_BASE=http://10.10.10.10:8091/models`.
 
 Worker auth is enabled. Each host generates a random `llama.cpp` API key during the model install step and the autostart step configures `llama-server` to require it.
 
@@ -263,6 +264,7 @@ Direct from local mirror:
 
 ```bash
 export OWNCLAUDE_RAW_BASE="http://10.10.10.10:8091"
+export OWNCLAUDE_MODEL_BASE="http://10.10.10.10:8091/models"
 curl -fsSL "$OWNCLAUDE_RAW_BASE/scripts/hosts/configure-dedicated-mac.sh" | sudo bash
 curl -fsSL "$OWNCLAUDE_RAW_BASE/scripts/hosts/8gb-qwen35-4b.sh" | bash
 curl -fsSL "$OWNCLAUDE_RAW_BASE/scripts/hosts/enable-autostart-8gb-qwen35-4b.sh" | bash
