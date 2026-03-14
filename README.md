@@ -385,13 +385,20 @@ curl -fsSL https://raw.githubusercontent.com/JimmyCapps/ownclaude/main/scripts/m
 This creates:
 
 - a git checkout under `/srv/ownclaude-mirror/repo`
+- a published mirror under `/srv/ownclaude-mirror/public`
 - a systemd timer that pulls from GitHub every minute
 - a systemd HTTP service on `10.10.10.10:8091`
+
+Freshness behavior:
+
+- while syncing or stale, script URLs return a shell script that prints `stale script mirror; retry shortly` and exits `1`
+- current status is published at `http://10.10.10.10:8091/status.json`
 
 Verify the mirror:
 
 ```bash
 curl -fsSL http://10.10.10.10:8091/scripts/install-llama-launchdaemon.sh | sed -n '1,40p'
+curl -fsSL http://10.10.10.10:8091/status.json
 ```
 
 ## Autostart setup
