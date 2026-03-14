@@ -18,13 +18,14 @@ if [[ -z "$CLAUDE_BIN" ]]; then
   exit 1
 fi
 
-if [[ -z "${LITELLM_API_KEY:-}" && -z "${ANTHROPIC_API_KEY:-}" ]]; then
-  echo "Set LITELLM_API_KEY or ANTHROPIC_API_KEY in $ENV_FILE or the environment"
+if [[ -z "${LITELLM_API_KEY:-}" && -z "${ANTHROPIC_AUTH_TOKEN:-}" && -z "${ANTHROPIC_API_KEY:-}" ]]; then
+  echo "Set LITELLM_API_KEY, ANTHROPIC_AUTH_TOKEN, or ANTHROPIC_API_KEY in $ENV_FILE or the environment"
   exit 1
 fi
 
 export ANTHROPIC_BASE_URL="${ANTHROPIC_BASE_URL:-$LITELLM_BASE_URL}"
-export ANTHROPIC_API_KEY="${ANTHROPIC_API_KEY:-${LITELLM_API_KEY:-}}"
+export ANTHROPIC_AUTH_TOKEN="${ANTHROPIC_AUTH_TOKEN:-${LITELLM_API_KEY:-${ANTHROPIC_API_KEY:-}}}"
+export ANTHROPIC_API_KEY="${ANTHROPIC_API_KEY:-$ANTHROPIC_AUTH_TOKEN}"
 
 exec "$CLAUDE_BIN" \
   --setting-sources project,local \

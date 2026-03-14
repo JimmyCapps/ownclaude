@@ -49,7 +49,8 @@ That launcher:
 
 - loads `.env.local` if present
 - exports `ANTHROPIC_BASE_URL` to the LiteLLM gateway
-- exports `ANTHROPIC_API_KEY` from `LITELLM_API_KEY`
+- exports `ANTHROPIC_AUTH_TOKEN` from `LITELLM_API_KEY`
+- also mirrors that into `ANTHROPIC_API_KEY` for compatibility
 - starts Claude with project settings enabled
 - defaults to `local-dev-primary`
 
@@ -92,3 +93,18 @@ For Claude Desktop and Claude in browser, keep the same requirements:
   - `local-vision`
 
 CLI comes first. Once the wrapper flow is stable, extend the same environment and settings strategy to Desktop and browser.
+
+## Auth note
+
+For LiteLLM gateway mode, Claude Code expects `ANTHROPIC_AUTH_TOKEN` for the static bearer token path.
+
+Anthropic docs:
+
+- [LLM gateway configuration](https://code.claude.com/docs/en/llm-gateway)
+
+The launcher sets both:
+
+- `ANTHROPIC_AUTH_TOKEN`
+- `ANTHROPIC_API_KEY`
+
+but `ANTHROPIC_AUTH_TOKEN` is the important one for this deployment.
