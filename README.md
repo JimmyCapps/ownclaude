@@ -248,6 +248,9 @@ curl -fsSL https://raw.githubusercontent.com/JimmyCapps/ownclaude/main/scripts/h
 curl -fsSL https://raw.githubusercontent.com/JimmyCapps/ownclaude/main/scripts/hosts/m1pro-16gb-qwen35-9b.sh | bash
 curl -fsSL https://raw.githubusercontent.com/JimmyCapps/ownclaude/main/scripts/hosts/8gb-qwen35-4b.sh | bash
 curl -fsSL https://raw.githubusercontent.com/JimmyCapps/ownclaude/main/scripts/hosts/8gb-qwen25-vl-3b.sh | bash
+curl -fsSL https://raw.githubusercontent.com/JimmyCapps/ownclaude/main/scripts/hosts/enable-autostart-m1pro-16gb-qwen35-9b.sh | bash
+curl -fsSL https://raw.githubusercontent.com/JimmyCapps/ownclaude/main/scripts/hosts/enable-autostart-8gb-qwen35-4b.sh | bash
+curl -fsSL https://raw.githubusercontent.com/JimmyCapps/ownclaude/main/scripts/hosts/enable-autostart-8gb-qwen25-vl-3b.sh | bash
 ```
 
 Direct rollback from GitHub:
@@ -257,6 +260,7 @@ curl -fsSL https://raw.githubusercontent.com/JimmyCapps/ownclaude/main/scripts/h
 curl -fsSL https://raw.githubusercontent.com/JimmyCapps/ownclaude/main/scripts/hosts/rollback-m1pro-16gb-qwen35-9b.sh | bash
 curl -fsSL https://raw.githubusercontent.com/JimmyCapps/ownclaude/main/scripts/hosts/rollback-8gb-qwen35-4b.sh | bash
 curl -fsSL https://raw.githubusercontent.com/JimmyCapps/ownclaude/main/scripts/hosts/rollback-8gb-qwen25-vl-3b.sh | bash
+curl -fsSL https://raw.githubusercontent.com/JimmyCapps/ownclaude/main/scripts/hosts/rollback-enable-autostart.sh | bash
 ```
 
 First, apply the dedicated-host baseline:
@@ -325,12 +329,20 @@ The dedicated-host baseline script:
 
 This does not yet install a boot-time `launchd` service for `llama.cpp`. That comes next.
 
+The autostart scripts:
+
+- install a system `LaunchDaemon`
+- start `llama-server` immediately
+- keep it running across reboot without login
+- write logs to `/opt/ownclaude/log`
+
 Rollback scripts:
 
 - stop any running `llama-server` that matches the configured model alias
 - remove the downloaded model directory created by the matching host script
 - remove the default `$HOME/llama.cpp` checkout if present
 - restore reachable-but-normal macOS power settings for the baseline script
+- remove the `LaunchDaemon` for the autostart script
 
 Rollback does not uninstall Homebrew or remove shared packages such as `cmake`, `git`, `wget`, or `huggingface-cli`, because those may have existed before testing.
 
@@ -348,6 +360,73 @@ The scripts default to Bartowski GGUF repos on Hugging Face for practical Apple 
 These settings are intended for dedicated LAN-only worker Macs.
 
 One important physical limitation remains: MacBooks still sleep when the lid is closed unless you run them in supported clamshell conditions or use other unsupported workarounds. The commands here keep the machine awake and reachable when powered on at the login window, but they do not bypass normal lid-close behavior.
+
+## Autostart setup
+
+After the model is installed on a host, enable boot-time serving.
+
+16 GB coding host:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/JimmyCapps/ownclaude/main/scripts/hosts/enable-autostart-m1pro-16gb-qwen35-9b.sh | bash
+```
+
+8 GB coding host:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/JimmyCapps/ownclaude/main/scripts/hosts/enable-autostart-8gb-qwen35-4b.sh | bash
+```
+
+8 GB OCR host:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/JimmyCapps/ownclaude/main/scripts/hosts/enable-autostart-8gb-qwen25-vl-3b.sh | bash
+```
+
+Verify locally on the host:
+
+```bash
+launchctl print system/com.ownclaude.llama-server
+curl http://127.0.0.1:8001/health
+curl http://127.0.0.1:8001/v1/models
+```
+
+## LiteLLM connection
+
+On the LiteLLM gateway, first confirm the worker responds over LAN:
+
+```bash
+curl http://WORKER_IP:8001/health
+curl http://WORKER_IP:8001/v1/models
+```
+
+Then add one entry to `litellm_config.yaml`:
+
+```yaml
+model_list:
+  - model_name: local-code-small-a
+    litellm_params:
+      model: openai/qwen35-4b
+      api_base: http://WORKER_IP:8001/v1
+      api_key: sk-local
+```
+
+For the 16 GB host:
+
+```yaml
+model_list:
+  - model_name: local-code-medium
+    litellm_params:
+      model: openai/qwen35-9b
+      api_base: http://WORKER_IP:8001/v1
+      api_key: sk-local
+```
+
+After updating the config, restart LiteLLM and verify from the gateway:
+
+```bash
+curl http://LITELLM_IP:4000/v1/models -H 'Authorization: Bearer sk-local'
+```
 
 ## Sources
 
