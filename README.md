@@ -251,6 +251,7 @@ Provision one Mac at a time after copying this workspace to that Mac, or run dir
 Direct from GitHub:
 
 ```bash
+curl -fsSL https://raw.githubusercontent.com/JimmyCapps/ownclaude/main/scripts/hosts/prereq.sh | bash
 curl -fsSL https://raw.githubusercontent.com/JimmyCapps/ownclaude/main/scripts/hosts/configure-dedicated-mac.sh | sudo bash
 curl -fsSL https://raw.githubusercontent.com/JimmyCapps/ownclaude/main/scripts/hosts/m1pro-16gb-qwen35-9b.sh | bash
 curl -fsSL https://raw.githubusercontent.com/JimmyCapps/ownclaude/main/scripts/hosts/8gb-qwen35-4b.sh | bash
@@ -263,6 +264,9 @@ curl -fsSL https://raw.githubusercontent.com/JimmyCapps/ownclaude/main/scripts/h
 Direct from local mirror:
 
 ```bash
+# one-time prerequisite, still fetched from the internet:
+curl -fsSL https://raw.githubusercontent.com/JimmyCapps/ownclaude/main/scripts/hosts/prereq.sh | bash
+
 export OWNCLAUDE_RAW_BASE="http://10.10.10.10:8091"
 export OWNCLAUDE_MODEL_BASE="http://10.10.10.10:8091/models"
 curl -fsSL "$OWNCLAUDE_RAW_BASE/scripts/hosts/configure-dedicated-mac.sh" | sudo bash
